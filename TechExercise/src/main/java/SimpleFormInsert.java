@@ -22,20 +22,26 @@ public class SimpleFormInsert extends HttpServlet {
    }
 
    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-      String userName = request.getParameter("userName");
-      String email = request.getParameter("email");
-      String phone = request.getParameter("phone");
+      String name = request.getParameter("name");
+      String author = request.getParameter("author");
+      String genre = request.getParameter("genre");
+      String reviewer = request.getParameter("reviewer");
+      String rating = request.getParameter("rating");
+      String review = request.getParameter("review");
 
       Connection connection = null;
-      String insertSql = " INSERT INTO myTable (id, MYUSER, EMAIL, PHONE) values (default, ?, ?, ?)";
+      String insertSql = " INSERT INTO BookReview (Name, Author, Genre, Reviewer, Rating, Review) values (?, ?, ?, ?, ?, ?)";
 
       try {
          DBConnection.getDBConnection(getServletContext());
          connection = DBConnection.connection;
          PreparedStatement preparedStmt = connection.prepareStatement(insertSql);
-         preparedStmt.setString(1, userName);
-         preparedStmt.setString(2, email);
-         preparedStmt.setString(3, phone);
+         preparedStmt.setString(1, name);
+         preparedStmt.setString(2, author);
+         preparedStmt.setString(3, genre);
+         preparedStmt.setString(4, reviewer);
+         preparedStmt.setString(5, rating);
+         preparedStmt.setString(6, review);
          preparedStmt.execute();
          connection.close();
       } catch (Exception e) {
@@ -54,13 +60,16 @@ public class SimpleFormInsert extends HttpServlet {
             "<h2 align=\"center\">" + title + "</h2>\n" + //
             "<ul>\n" + //
 
-            "  <li><b>User Name</b>: " + userName + "\n" + //
-            "  <li><b>Email</b>: " + email + "\n" + //
-            "  <li><b>Phone</b>: " + phone + "\n" + //
+            "  <li><b>Name of Book</b>: " + name + "\n" + //
+            "  <li><b>Author</b>: " + author + "\n" + //
+            "  <li><b>Genre</b>: " + genre + "\n" + //
+            "  <li><b>Name of Reviewer</b>: " + reviewer + "\n" + //
+            "  <li><b>Rating (? out of 5)</b>: " + rating + "\n" + //
+            "  <li><b>Review/Opinion</b>: " + review + "\n" + //
 
             "</ul>\n");
 
-      out.println("<a href=/webproject/simpleFormSearch.html>Search Data</a> <br>");
+      out.println("<a href=/TechExercise/simpleFormSearch.html>Search Data</a> <br>");
       out.println("</body></html>");
    }
 

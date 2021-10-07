@@ -20,11 +20,13 @@ public class SimpleFormSearch extends HttpServlet {
    }
 
    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-      String keyword = request.getParameter("keyword");
-      search(keyword, response);
+      String name = request.getParameter("name");
+      String author = request.getParameter("author");
+      String genre = request.getParameter("genre");
+      search(name, author, genre, response);
    }
 
-   void search(String keyword, HttpServletResponse response) throws IOException {
+   void search(String name, String author, String genre, HttpServletResponse response) throws IOException {
       response.setContentType("text/html");
       PrintWriter out = response.getWriter();
       String title = "Database Result";
@@ -42,31 +44,87 @@ public class SimpleFormSearch extends HttpServlet {
          DBConnection.getDBConnection(getServletContext());
          connection = DBConnection.connection;
 
-         if (keyword.isEmpty()) {
-            String selectSQL = "SELECT * FROM myTable";
+         if (author.isEmpty() && genre.isEmpty() && name.isEmpty()) {
+            String selectSQL = "SELECT * FROM BookReview";
             preparedStatement = connection.prepareStatement(selectSQL);
-         } else {
-            String selectSQL = "SELECT * FROM myTable WHERE MYUSER LIKE ?";
-            String theUserName = keyword + "%";
+         }
+         else if (name.isEmpty() && genre.isEmpty()){
+            String selectSQL = "SELECT * FROM BookReview WHERE Author LIKE ?";
+            String BookAuthor = author + "%";
             preparedStatement = connection.prepareStatement(selectSQL);
-            preparedStatement.setString(1, theUserName);
+            preparedStatement.setString(1, BookAuthor);
+         }
+         else if (author.isEmpty() && genre.isEmpty()){
+             String selectSQL = "SELECT * FROM BookReview WHERE Name LIKE ?";
+             String BookName = name + "%";
+             preparedStatement = connection.prepareStatement(selectSQL);
+             preparedStatement.setString(1, BookName);
+          }
+         else if (author.isEmpty() && name.isEmpty()){
+             String selectSQL = "SELECT * FROM BookReview WHERE Genre LIKE ?";
+             String BookGenre = genre + "%";
+             preparedStatement = connection.prepareStatement(selectSQL);
+             preparedStatement.setString(1, BookGenre);
+          }
+         else if (author.isEmpty()){
+             String selectSQL = "SELECT * FROM BookReview WHERE Name LIKE ? AND Genre LIKE ?";
+             String BookName = name + "%";
+             String BookGenre = genre + "%";
+             preparedStatement = connection.prepareStatement(selectSQL);
+             preparedStatement.setString(1, BookName);
+             preparedStatement.setString(2, BookGenre);
+          }
+         else if (genre.isEmpty()){
+             String selectSQL = "SELECT * FROM BookReview WHERE Name LIKE ? AND Author LIKE ?";
+             String BookName = name + "%";
+             String BookAuthor = author + "%";
+             preparedStatement = connection.prepareStatement(selectSQL);
+             preparedStatement.setString(1, BookName);
+             preparedStatement.setString(2, BookAuthor);
+          }
+         else if (name.isEmpty()){
+             String selectSQL = "SELECT * FROM BookReview WHERE Author LIKE ? AND Genre LIKE ?";
+             String BookAuthor = author + "%";
+             String BookGenre = genre + "%";
+             preparedStatement = connection.prepareStatement(selectSQL);
+             preparedStatement.setString(1, BookAuthor);
+             preparedStatement.setString(2, BookGenre);
+          }
+         else {
+        	 String selectSQL = "SELECT * FROM BookReview WHERE Name LIKE ? AND Author LIKE ? AND Genre LIKE ?";
+             String BookName = name + "%";
+        	 String BookAuthor = author + "%";
+             String BookGenre = genre + "%";
+             preparedStatement = connection.prepareStatement(selectSQL);
+             preparedStatement.setString(1, BookName);
+             preparedStatement.setString(2, BookAuthor);
+             preparedStatement.setString(3, BookGenre);
          }
          ResultSet rs = preparedStatement.executeQuery();
 
          while (rs.next()) {
-            int id = rs.getInt("id");
-            String userName = rs.getString("myuser").trim();
-            String email = rs.getString("email").trim();
-            String phone = rs.getString("phone").trim();
-
-            if (keyword.isEmpty() || userName.contains(keyword)) {
-               out.println("ID: " + id + ", ");
-               out.println("User: " + userName + ", ");
-               out.println("Email: " + email + ", ");
-               out.println("Phone: " + phone + "<br>");
-            }
-         }
-         out.println("<a href=/webproject/simpleFormSearch.html>Search Data</a> <br>");
+             String BookName = rs.getString("name").trim();
+             String BookAuthor = rs.getString("author").trim();
+             String BookGenre = rs.getString("genre").trim();
+             String BookReviewer = rs.getString("reviewer").trim();
+             String BookRating = rs.getString("rating").trim();
+             String BookReview = rs.getString("review").trim();
+             
+             out.println("Name of Book: " + BookName + ", ");
+             out.println("Author: " + BookAuthor + ", ");
+             out.println("Genre: " + BookGenre + ", ");
+             out.println("Name of Reviewer: " + BookReviewer + ", ");
+             out.println("Rating (? out of 5): " + BookRating + ", ");
+             out.println("Review/Opinion: " + BookReview + "<br>");
+             
+             //if ( (email.isEmpty() && number.isEmpty()) || mail.contains(email) || phone.contains(number)) {
+             //   out.println("ID: " + id + ", ");
+             //   out.println("User: " + userName + ", ");
+             //   out.println("Email: " + mail + ", ");
+             //   out.println("Phone: " + phone + "<br>");
+             //}
+          }
+         out.println("<a href=/TechExercise/simpleFormSearch.html>Search Data</a> <br>");
          out.println("</body></html>");
          rs.close();
          preparedStatement.close();
